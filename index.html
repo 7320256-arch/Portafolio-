@@ -657,7 +657,7 @@ function fichaHTML(p,i){
             '<button type="button" class="mini-btn" data-act="retry">Reintentar</button></div>'+
         '</div>'+
         '</div>'+
-        '<p class="preview-hint">Vista en vivo del proyecto real · pulsa «Interactuar» para probarlo aquí mismo.</p>'+
+        '<p class="preview-hint">Vista en vivo del proyecto real, sin sonido · pulsa «Interactuar» para probarlo aquí mismo.</p>'+
       '</div>'+
     '</div>'+
   '</article>';
@@ -683,60 +683,68 @@ function ajustar(prev){
   fr.style.transform = 'scale('+s+')';
 }
 
-/* ---------- Vistas previas SIN SONIDO ----------
-   Las muestras se ven y se animan, pero nunca suenan (ni solas ni al tocarlas).
-   Se descarga la página del proyecto y se le añade, antes de todo lo demás,
-   un bloque que silencia música, efectos y voz. El proyecto real, al abrirlo, suena normal. */
-function silenciar(w){
-  try{
-    var d = w.document;
-    var H = w.HTMLMediaElement && w.HTMLMediaElement.prototype;
-    if (H){
-      var dm = Object.getOwnPropertyDescriptor(H,'muted'), dv = Object.getOwnPropertyDescriptor(H,'volume');
-      var play = H.play;
-      H.play = function(){ try{ dm.set.call(this,true); dv.set.call(this,0); }catch(e){} return play.apply(this,arguments); };
-      Object.defineProperty(H,'muted',{configurable:true,get:function(){return true;},set:function(){ dm.set.call(this,true); }});
-      Object.defineProperty(H,'volume',{configurable:true,get:function(){return 0;},set:function(){ dv.set.call(this,0); }});
-      var sil = function(root){ try{
-        (root.querySelectorAll ? root.querySelectorAll('audio,video') : []).forEach(function(m){ dm.set.call(m,true); dv.set.call(m,0); });
-        if (root.matches && root.matches('audio,video')){ dm.set.call(root,true); dv.set.call(root,0); }
-      }catch(e){} };
-      d.addEventListener('play', function(e){ if (e.target && e.target.pause){ try{ dm.set.call(e.target,true); dv.set.call(e.target,0); }catch(x){} } }, true);
-      new w.MutationObserver(function(ms){ ms.forEach(function(m){ m.addedNodes.forEach(function(n){ if (n.nodeType===1) sil(n); }); }); })
-        .observe(d.documentElement || d, {childList:true, subtree:true});
-      sil(d);
+/* ---------- Vistas previas SIN sonido ----------
+   Antes de que arranque el proyecto se le inyecta un silenciador: apaga audio/video, el sonido
+   generado por el navegador (Web Audio) y la voz. Así las animaciones se ven, pero nada suena,
+   ni siquiera al interactuar. */
+const MUTE_FN = function(){
+  if (window.__silencio) return; window.__silencio = 1;
+  var nop = function(){};
+  try {
+    var M = window.HTMLMediaElement && HTMLMediaElement.prototype;
+    if (M){
+      var pd = Object.getOwnPropertyDescriptor(M,'muted');
+      var setMut = function(el){ try{ pd.set.call(el,true); }catch(e){} };
+      var play = M.play;
+      M.play = function(){ setMut(this); return play.apply(this,arguments); };
+      Object.defineProperty(M,'muted',{configurable:true,get:function(){return true;},set:nop});
+      Object.defineProperty(M,'volume',{configurable:true,get:function(){return 0;},set:nop});
+      var mudos = function(){ var l=document.querySelectorAll('audio,video'); for(var i=0;i<l.length;i++) setMut(l[i]); };
+      mudos(); setInterval(mudos,250);
+      document.addEventListener('play',function(e){ setMut(e.target); },true);
     }
-    var AN = w.AudioNode && w.AudioNode.prototype;
-    if (AN && w.AudioDestinationNode){
-      var conn = AN.connect;
-      AN.connect = function(dest){
-        if (dest instanceof w.AudioDestinationNode) return dest;   /* nada llega a las bocinas */
-        return conn.apply(this,arguments);
-      };
-    }
-    if (w.speechSynthesis){ try{ w.speechSynthesis.speak = function(){}; }catch(e){} }
-    if (w.navigator && w.navigator.vibrate){ try{ w.navigator.vibrate = function(){ return false; }; }catch(e){} }
-  }catch(e){}
+  } catch(e){}
+  try {
+    var oc = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(d){
+      if (d && window.AudioDestinationNode && d instanceof AudioDestinationNode){
+        var c = this.context;
+        if (!c.__mudo){ c.__mudo = c.createGain(); c.__mudo.gain.value = 0; oc.call(c.__mudo,d); }
+        oc.apply(this,[c.__mudo].concat([].slice.call(arguments,1)));
+        return d;
+      }
+      return oc.apply(this,arguments);
+    };
+  } catch(e){}
+  try { if (window.speechSynthesis) speechSynthesis.speak = nop; } catch(e){}
+  try {
+    document.addEventListener('click',function(e){
+      var a = e.target && e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      e.preventDefault();
+      var id = a.getAttribute('href').slice(1), t = id && document.getElementById(id);
+      if (t && t.scrollIntoView) t.scrollIntoView();
+    },true);
+  } catch(e){}
+};
+function silenciar(fr){
+  try { const w = fr.contentWindow; if (w && w.document) new w.Function('('+MUTE_FN.toString()+')()')(); } catch(e){}
 }
-
-function cargarSilencioso(fr, url, alTerminar){
-  const usarSrc = ()=>{
-    fr.removeAttribute('srcdoc');
-    fr.addEventListener('load', ()=>{ try{ silenciar(fr.contentWindow); }catch(e){} }, {once:true});
-    fr.src = url;
-  };
-  if (location.protocol==='file:' || !window.fetch){ usarSrc(); return; }
-  fetch(url,{cache:'no-store'}).then(r=>{ if(!r.ok) throw 0; return r.text(); }).then(html=>{
-    const inyeccion = '<base href="'+url+'"><script>('+silenciar.toString()+')(window);<\/script>';
-    let out;
-    if (/<head[^>]*>/i.test(html)) out = html.replace(/<head[^>]*>/i, m=>m+inyeccion);
-    else if (/<html[^>]*>/i.test(html)) out = html.replace(/<html[^>]*>/i, m=>m+'<head>'+inyeccion+'</head>');
-    else out = inyeccion + html;
+function montar(fr,url,alCargar){
+  fr._cb = alCargar;
+  if (!fr._mut){
+    fr._mut = 1;
+    fr.addEventListener('load',()=>{ silenciar(fr); if (fr._cb) fr._cb(); });
+  }
+  const directo = ()=>{ fr.removeAttribute('srcdoc'); fr.src = url; };
+  if (location.protocol==='file:') { directo(); return; }
+  fetch(url).then(r=>{ if(!r.ok) throw 0; return r.text(); }).then(html=>{
+    const abs = new URL(url,location.href).href;
+    const inj = '<base href="'+abs+'"><script>('+MUTE_FN.toString()+')()<\/script>';
     fr.removeAttribute('src');
-    fr.srcdoc = out;
-  }).catch(usarSrc);
+    fr.srcdoc = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i,m=>m+inj) : inj+html;
+  }).catch(directo);
 }
-
 function probar(url){
   if (location.protocol==='file:') return Promise.resolve(true);
   if (navigator.onLine===false) return Promise.resolve(false);
@@ -752,8 +760,7 @@ function cargarPreview(prev,forzar){
   prev.classList.remove('sinvista','cargado');
   probar(prev.dataset.src).then(ok=>{
     if (!ok){ prev.classList.add('sinvista'); return; }
-    fr.addEventListener('load', ()=>prev.classList.add('cargado'), {once:true});
-    cargarSilencioso(fr, prev.dataset.src);
+    montar(fr, prev.dataset.src, ()=>prev.classList.add('cargado'));
   });
 }
 
@@ -818,7 +825,7 @@ $$('.thumb').forEach(t=>{
   const cargar = (forzar)=>{ const fr=$('iframe',t); if (fr.dataset.ok && !forzar) return; fr.dataset.ok='1';
     t.classList.remove('sinvista','cargado');
     probar(t.dataset.src).then(ok=>{ if (!ok){ t.classList.add('sinvista'); return; }
-      fr.addEventListener('load',()=>t.classList.add('cargado'),{once:true}); cargarSilencioso(fr, t.dataset.src); }); };
+      montar(fr, t.dataset.src, ()=>t.classList.add('cargado')); }); };
   t._cargar = cargar;
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es=>es.forEach(e=>{ if (e.isIntersecting){ cargar(); io.disconnect(); } }),{rootMargin:'200px'});
