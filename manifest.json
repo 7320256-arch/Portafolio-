@@ -1,0 +1,40 @@
+{
+  "id": "./",
+  "name": "Christopher Alejo · Portafolio",
+  "short_name": "Portafolio",
+  "description": "Portafolio de juegos y herramientas web de Christopher Alejo.",
+  "lang": "es-SV",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2eee4",
+  "theme_color": "#f2eee4",
+  "categories": ["productivity", "utilities", "education"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
