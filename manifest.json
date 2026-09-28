@@ -11,6 +11,23 @@
   "theme_color": "#f2eee4",
   "categories": ["productivity", "utilities", "education"],
   "prefer_related_applications": false,
+  "orientation": "any",
+  "screenshots": [
+    {
+      "src": "./screenshots/portafolio-desktop.png",
+      "sizes": "1365x768",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Portafolio en escritorio"
+    },
+    {
+      "src": "./screenshots/portafolio-movil.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Portafolio en móvil"
+    }
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",

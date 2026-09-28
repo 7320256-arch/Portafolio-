@@ -980,6 +980,13 @@ document.addEventListener('keydown',e=>{
   else if (e.key==='Escape' && pal.classList.contains('abierta')) cerrarPaleta();
 });
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .catch(function (error) { console.warn('No se pudo registrar el service worker:', error); });
+  });
+}
+
 })();
 </script>
 </body>
