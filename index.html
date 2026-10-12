@@ -905,7 +905,6 @@ aplicarFiltro('todos');
   const a = [];
   if (PERFIL.email)    a.push('<a class="btn primary" href="mailto:'+esc(PERFIL.email)+'?subject='+encodeURIComponent('Consulta desde tu portafolio')+'">Escríbeme un correo</a>');
   if (PERFIL.whatsapp) a.push('<a class="btn '+(a.length?'ghost':'primary')+'" href="https://wa.me/'+esc(PERFIL.whatsapp)+'?text='+encodeURIComponent('Hola, vi tu portafolio y me gustaría hablar de un proyecto.')+'" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>');
-  a.push('<a class="btn '+(a.length?'ghost':'primary')+'" href="'+esc(PERFIL.github)+'" target="_blank" rel="noopener noreferrer">GitHub ↗</a>');
   $('#contactoAcciones').innerHTML = a.join('');
 })();
 
@@ -953,7 +952,6 @@ function comandos(){
   c.push({g:'Secciones',t:'Sobre mí',h:'',run:()=>irA('sobre-mi')});
   c.push({g:'Secciones',t:'Contacto',h:'',run:()=>irA('contacto')});
   c.push({g:'Acciones',t:'Cambiar tema claro / oscuro',h:'',run:alternarTema});
-  c.push({g:'Acciones',t:'Abrir mi perfil de GitHub',h:'↗',run:()=>window.open(PERFIL.github,'_blank','noopener')});
   return c;
 }
 const TODOS_CMD = comandos();
