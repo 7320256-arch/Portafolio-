@@ -261,6 +261,12 @@
   .contacto .btn.primary{background:var(--paper);color:var(--ink);box-shadow:4px 4px 0 var(--accent);}
   .contacto .btn.ghost{color:var(--paper);}
   .contacto .btn.ghost:hover{background:var(--paper);color:var(--ink);}
+  .precios{margin-top:36px;display:grid;gap:16px;max-width:620px;}
+  .precio-card{border:1px solid color-mix(in srgb,var(--paper) 30%,transparent);border-radius:12px;padding:22px 24px;}
+  .precio-card h3{font-family:var(--font-display);font-size:1.35rem;letter-spacing:-.01em;}
+  .precio-card .monto{margin-top:8px;font-family:var(--font-mono);font-size:1.05rem;color:var(--accent);}
+  .precio-card ul{margin-top:14px;padding-left:18px;color:color-mix(in srgb,var(--paper) 78%,transparent);font-size:.95rem;line-height:1.55;}
+  .precio-card .nota{margin-top:12px;font-size:.9rem;color:color-mix(in srgb,var(--paper) 62%,transparent);}
 
   footer{position:relative;z-index:1;padding:26px 0 34px;font-family:var(--font-mono);font-size:.74rem;color:var(--mute);background:var(--ink);}
   footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid color-mix(in srgb,var(--paper) 18%,transparent);padding-top:22px;color:color-mix(in srgb,var(--paper) 55%,transparent);}
@@ -407,6 +413,24 @@
     <p class="sec-idx">03 — Contacto</p>
     <h2>¿Tienes una idea? <em>Hagámosla</em> funcionar.</h2>
     <p class="lead" id="contactoLead">Cuéntame qué necesitas: un menú digital, un marcador para tu evento, una herramienta a medida o un sitio web sencillo. Te respondo con una propuesta y un precio según el alcance.</p>
+    <div class="precios">
+      <article class="precio-card">
+        <h3>Menú digital con pedidos por WhatsApp</h3>
+        <p class="monto">$25 pago único · luego $10 al mes</p>
+        <ul>
+          <li>Carta digital con tus productos y precios, lista para celular</li>
+          <li>Código QR para imprimir en mesa o mostrador</li>
+          <li>Pedidos que llegan ya armados a tu WhatsApp</li>
+          <li>Hosting incluido y soporte por WhatsApp</li>
+          <li>Cambios de precios y productos (hasta 2 al mes)</li>
+        </ul>
+      </article>
+      <article class="precio-card">
+        <h3>Marcadores, apps a medida y sitios web</h3>
+        <p class="monto">Precio a consultar</p>
+        <p class="nota">Cada proyecto es distinto, así que te doy una propuesta según lo que necesites.</p>
+      </article>
+    </div>
     <div class="acciones" id="contactoAcciones"></div>
   </div>
 </section>
@@ -454,10 +478,10 @@
 const PERFIL = {
   alias:      'Christopher Alejo',      // Tu usuario de GitHub (aparece arriba a la izquierda)
   nombre:     'Christopher Alejo',                  // ← Tu nombre real. Ej: 'María Pérez'. Vacío = no se muestra
-  ubicacion:  'El Salvador',       // ← Confirma o cambia (déjalo '' para ocultar)
+  ubicacion:  'Jiquilisco, Usulután, El Salvador',       // ← Confirma o cambia (déjalo '' para ocultar)
   github:     'https://github.com/7320256-arch',
   email:      'cseuropa1890@gmail.com',                  // ← Tu correo. Ej: 'tucorreo@gmail.com'  (vacío = no se muestra)
-  whatsapp:   '',                  // ← Tu número con código de país. Ej: '50370000000'  (vacío = oculto)
+  whatsapp:   '50369564794',       // ← Tu número con código de país. Ej: '50370000000'  (vacío = oculto)
   bio: 'Creo herramientas digitales para negocios y eventos: desde un <em>menú digital</em> que envía los pedidos por WhatsApp hasta un <em>marcador deportivo</em> para torneos. Todo se abre desde el navegador, sin instalar nada, y funciona en cualquier celular o computadora.',
   habilidades: ['Menús digitales','Pedidos por WhatsApp','Marcadores deportivos','Herramientas a medida','Sitios web sencillos'],
   principios: [
